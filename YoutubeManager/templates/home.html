@@ -9,9 +9,17 @@
     <title>Youtube Manager</title>
 </head>
 
-<body>
+<body onload="populate_filter_criteria('{{filter_criteria}}')">
+    <div id="messageBanner"></div>
     <form method="POST" id="videoSearchingForm">
-        <input type="url" name="search_url" value="{{search_url}}"> <input type="submit" value="Search">
+        <input type="url" name="search_url" value="{{search_url}}"> 
+        <select name="filter_criteria">
+            <option id="filter_criteria_all" value="all">All</option>
+            <option id="filter_criteria_audio_video" value="audio_video">Audio and Video</option>
+            <option id="filter_criteria_video" value="video">Only Video</option>
+            <option id="filter_criteria_audio" value="audio">Only Audio</option>
+        </select>
+        <input style="margin-left: 30px;" type="submit" value="Search">
         {% csrf_token %}
     </form>
     <div id="all-videos-container">
@@ -63,7 +71,16 @@
     body {
         background-color: rgba(255, 0, 0, 0.1);
     }
-
+    #messageBanner{
+        position: absolute;
+        top:0px;
+        left: 0px;
+        width: 100vw;
+        height: 5vh;
+        background-color: red;
+        color: white;
+        display: none;
+    }
     #videoSearchingForm {
         position: absolute;
         top: 10vh;
@@ -86,7 +103,57 @@
     }
 </style>
 <script>
+    function hideMessageBanner(){
+        let banner = document.querySelector("#messageBanner");
+        banner.style.display = "none";
+    }
+    function showMessageBanner(level, message, persist){
+        if(!message){
+            message = level;
+            level = "info";
+        }
+        let banner = document.querySelector("#messageBanner");
+        banner.style.display = "block";
+        switch(level){
+            case "info":
+            case "INFO":
+                backgroundColor = "grey";
+                color = "white";
+                break;
+            case "warn":
+            case "warning":
+            case "WARN":
+            case "WARNING":
+                backgroundColor = "yellow";
+                color = "orange";
+                break;
+            case "error":
+            case "ERROR":
+                backgroundColor = "red";
+                color = "white";
+                break;
+            case "success": 
+            case "SUCCESS": 
+                backgroundColor = "green";
+                color = "white";
+                break;
+            default:
+                backgroundColor = "grey";
+                color = "white";                
+        }        
+        banner.innerHTML = message;
+        banner.style.backgroundColor = backgroundColor;
+        banner.style.color = color;
+        if(!persist){
+            setTimeout(hideMessageBanner, 3000);
+        }
+    }
+    function populate_filter_criteria(value) {
+        if(!value) return;
+        document.getElementById("filter_criteria_"+value).setAttribute("selected","");
+    };
     function downloadFromYoutube(resolution, audio, video, url, title, type) {
+        showMessageBanner("info", "Downloading video . . . ", true)
         fetch("http://127.0.0.1:8000/downloadVideo", {
             method: "POST",
             headers: {
@@ -101,6 +168,8 @@
                 "type": title
             })
         })
+        .then(json => showMessageBanner("success", "Video Downloaded"))
+        .catch(err => showMessageBanner("error", "Video download failed"+err))
     }
 </script>
 
