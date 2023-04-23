@@ -12,7 +12,7 @@
 <body onload="populate_filter_criteria('{{filter_criteria}}')">
     <div id="messageBanner"></div>
     <form method="POST" id="videoSearchingForm">
-        <input type="url" name="search_url" value="{{search_url}}"> 
+        <input type="url" name="search_url" style="width: 40vw;" value="{{search_url}}"> 
         <select name="filter_criteria">
             <option id="filter_criteria_all" value="all">All</option>
             <option id="filter_criteria_audio_video" value="audio_video">Audio and Video</option>
@@ -57,9 +57,8 @@
                         '{{video.audio_codec}}',
                         '{{video.video_codec}}',
                         '{{search_url}}',
-                        '{{video.title}}',
                         '{{video.type}}'
-                    )">Download Video</button></td>
+                    )">Download</button></td>
                 </tr>
             </table>
             {% csrf_token %}
@@ -84,7 +83,7 @@
     #videoSearchingForm {
         position: absolute;
         top: 10vh;
-        left: 20vw;
+        left: 10vw;
         width: 60vw;
         height: 80vh;
         padding: 5vw;
@@ -152,8 +151,8 @@
         if(!value) return;
         document.getElementById("filter_criteria_"+value).setAttribute("selected","");
     };
-    function downloadFromYoutube(resolution, audio, video, url, title, type) {
-        showMessageBanner("info", "Downloading video . . . ", true)
+    function downloadFromYoutube(resolution, audio, video, url, type) {
+        showMessageBanner("info", "Downloading  . . . ", true)
         fetch("http://127.0.0.1:8000/downloadVideo", {
             method: "POST",
             headers: {
@@ -163,13 +162,14 @@
                 "url": url,
                 "video": video,
                 "audio": audio,
-                "title": title,
+                "title": "",
                 "resolution": resolution,
-                "type": title
+                "type": type
             })
         })
-        .then(json => showMessageBanner("success", "Video Downloaded"))
-        .catch(err => showMessageBanner("error", "Video download failed"+err))
+        .then(json => json.json())
+        .then(json => showMessageBanner("success", "Download Success"))
+        .catch(err => showMessageBanner("error", "Download failed"+err))
     }
 </script>
 
