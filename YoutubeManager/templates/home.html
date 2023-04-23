@@ -68,7 +68,8 @@
 </body>
 <style>
     body {
-        background-color: rgba(255, 0, 0, 0.1);
+        background-color: rgba(64, 67, 197, 1);
+        overflow-x: hidden;
     }
     #messageBanner{
         position: absolute;
@@ -167,8 +168,10 @@
                 "type": type
             })
         })
-        .then(json => json.json())
-        .then(json => showMessageBanner("success", "Download Success"))
+        .then(json => {
+            if(json.status>=400) throw Error(json.statusText);
+            showMessageBanner("success", "Download Success");
+        })
         .catch(err => showMessageBanner("error", "Download failed"+err))
     }
 </script>
