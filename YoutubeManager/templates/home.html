@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="static/images/favicon.ico">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube Manager</title>
+</head>
+
+<body>
+    <form method="POST" id="videoSearchingForm">
+        <input type="url" name="search_url" value="{{search_url}}"> <input type="submit" value="Search">
+        {% csrf_token %}
+    </form>
+    <div id="all-videos-container">
+        {% for video in all_videos %}
+        <div class="video-item" method="POST">
+            <table>
+                <tr>
+                    <td>Resolution:</td>
+                    <td><input type="text" value='{{video.resolution}}' disabled name="resolution"></td>
+                </tr>
+                <tr>
+                    <td>Audio:</td>
+                    <td><input type="text" value='{{video.audio_codec}}' disabled name="audio_codec"></td>
+                </tr>
+                <tr>
+                    <td>Video:</td>
+                    <td><input type="text" value='{{video.video_codec}}' disabled name="video_codec"></td>
+                </tr>
+                <tr>
+                    <td>URL:</td>
+                    <td><input type="text" value='{{search_url}}' disabled name="url"></td>
+                </tr>
+                <tr>
+                    <td>Type:</td>
+                    <td><input type="text" value='{{video.type}}' disabled name="type"></td>
+                </tr>
+                <tr>
+                    <td>Title:</td>
+                    <td><input type="text" value='{{video.title}}' disabled name="title"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><button type="submit" onclick="downloadFromYoutube(
+                        '{{video.resolution}}',
+                        '{{video.audio_codec}}',
+                        '{{video.video_codec}}',
+                        '{{search_url}}',
+                        '{{video.title}}',
+                        '{{video.type}}'
+                    )">Download Video</button></td>
+                </tr>
+            </table>
+            {% csrf_token %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+<style>
+    body {
+        background-color: rgba(255, 0, 0, 0.1);
+    }
+
+    #videoSearchingForm {
+        position: absolute;
+        top: 10vh;
+        left: 20vw;
+        width: 60vw;
+        height: 80vh;
+        padding: 5vw;
+        align-items: center;
+    }
+
+    #all-videos-container {
+        position: absolute;
+        top: 30vh;
+        left: 0;
+        width: 90vw;
+        padding-left: 5vw;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+</style>
+<script>
+    function downloadFromYoutube(resolution, audio, video, url, title, type) {
+        fetch("http://127.0.0.1:8000/downloadVideo", {
+            method: "POST",
+            headers: {
+                "Access-Control-Allow-Orign": "*"
+            },
+            body:JSON.stringify({
+                "url": url,
+                "video": video,
+                "audio": audio,
+                "title": title,
+                "resolution": resolution,
+                "type": title
+            })
+        })
+    }
+</script>
+
+</html>
